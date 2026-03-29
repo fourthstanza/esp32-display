@@ -12,10 +12,47 @@
 \section{Resources}
 
 \begin{itemize}
-\item \href{https://www.waveshare.com/wiki/ESP32-S3-Touch-LCD-1.28}{module wiki}
+\item \href{https://www.waveshare.com/wiki/ESP32-S3-Touch-LCD-1.28}{entire module wiki}
 \item \href{https://www.winbond.com/resource-files/w25q128jv%20revf%2003272018%20plus.pdf#page=4.14}{RAM module specsheet}
 \end{itemize}
 
+\section{Gif converter}
 
+Uses typescript frontend webapp to convert gif files into hex for upload to ESP.
+
+\subsection{Libraries}
+
+\subsubsection{gifuct-js}
+
+Allows for parsing and decompressing of gif file.
+
+\subsection{functions}
+
+\subsubsection{loadGIF}
+\begin{itemize}
+\item input: Gif file
+\item output: frames[], each frame in frames is an array which looks like \{
+  width,
+  height,
+  delay,
+  patch (Uint8ClampedArray (RGBA))
+\}
+\end{itemize}
+
+intakes gif \& converts it into an array of frames w/ frame data
+
+\subsubsection{frameToImageData}
+\begin{itemize}
+\item input: single frames[] array element
+\item output: imageData object
+\end{itemize}
+
+draws the current frame to a canvas 
+
+\subsubsection{rgbTo565}
+\begin{itemize}
+\item input: single rgb pixel
+\item output: 16 bit hex value of the pixel
+\end{itemize}
 
 \end{document}
