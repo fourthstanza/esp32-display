@@ -55,4 +55,16 @@ draws the current frame to a canvas
 \item output: 16 bit hex value of the pixel
 \end{itemize}
 
+\section{ESP32 Deployment}
+
+\subsection{Notes}
+Strange behaviour with colours, green and blue are swapped. I think there's some sort of strangeness with how the colours are sent over SPI, or with the driver somewhere.
+The normal RGB565 format is RRRRRGGGGGGBBBBB, but the display seems to be displaying as RRRRRBBBBBGGGGGG, or maybe RRRRRBBBBBBGGGGG. Bitwise shifting the blue value to the left by 6 bits and green to the right by 5 bits resolves 
+the issue but it's a bit of a hacky solution that loses us 1 bit of precision in green. The function uint16\_t colorfix(uint16\_t color) handles shifting any colours.\\
+Resolved with lv\_draw\_sw\_rgb565\_swap(src, w * h)! See explanation here: \url{https://docs.lvgl.io/9.4/API/draw/sw/lv_draw_sw_utils_h.html#_CPPv422lv_draw_sw_rgb565_swapPv8uint32_t}
+Have not yet tested outside of lvgl drawing, but we'll go with this for now, as we shouldn't need to operate outside of lvgl.\\
+Save images to PSRAM (2mb limit). This means images are lost on power disconnect.\\
+
+Monitor ADC for battery voltage and go into deep sleep when battery is low?
+
 \end{document}
