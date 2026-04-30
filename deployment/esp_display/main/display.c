@@ -6,20 +6,32 @@
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_gc9a01.h"
 #include "board.h"
+#include "driver/ledc.h"
 
 static const char *TAG = "LCD";
 
 esp_lcd_panel_handle_t display_startup(void)
 {
-    
-    gpio_config_t bk_gpio_config = {
-        .mode = GPIO_MODE_OUTPUT,
-        .pin_bit_mask = 1ULL << PIN_NUM_LCD_BL,
+    ESP_LOGI(TAG, "Configuring backlight");
+    ledc_timer_config_t ledc_timer = {
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .duty_resolution = 8,
+        .timer_num = LEDC_TIMER_0,
+        .freq_hz = 5000,
+        .clk_cfg = LEDC_AUTO_CLK,
     };
-    ESP_ERROR_CHECK(gpio_config(&bk_gpio_config));
+    ESP_ERROR_CHECK(ledc_timer_config(&ledc_timer));
 
-    // Turn backlight on
-    gpio_set_level(PIN_NUM_LCD_BL, 1);
+    ledc_channel_config_t ledc_channel = {
+        .gpio_num = PIN_NUM_LCD_BL,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .channel = LEDC_CHANNEL_0,
+        .timer_sel = LEDC_TIMER_0,
+        .duty = 100,
+        .hpoint = 0,
+        .sleep_mode = LEDC_SLEEP_MODE_NO_ALIVE_NO_PD,
+    };
+    ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
 
     ESP_LOGI(TAG, "Initialize SPI bus");
     const spi_bus_config_t bus_config = GC9A01_PANEL_BUS_SPI_CONFIG(PIN_NUM_LCD_PCLK, PIN_NUM_LCD_MOSI,
@@ -36,9 +48,9 @@ esp_lcd_panel_handle_t display_startup(void)
     esp_lcd_panel_handle_t panel_handle = NULL;
     
     const esp_lcd_panel_dev_config_t panel_config = {
-        .reset_gpio_num = PIN_NUM_LCD_RST,           // Set to -1 if not use
-        .rgb_ele_order = RGB_ORDER,                  // RGB element order: R-G-B
-        .bits_per_pixel = 16,                        // Implemented by LCD command `3Ah` (16/18)
+        .reset_gpio_num = PIN_NUM_LCD_RST,           
+        .rgb_ele_order = RGB_ORDER,                  
+        .bits_per_pixel =  LCD_BIT_PER_PIXEL,                        
     };
     ESP_ERROR_CHECK(esp_lcd_new_panel_gc9a01(io_handle, &panel_config, &panel_handle));
     ESP_ERROR_CHECK(esp_lcd_panel_reset(panel_handle));
