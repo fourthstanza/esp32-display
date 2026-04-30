@@ -9,6 +9,21 @@
 #include "driver/ledc.h"
 
 static const char *TAG = "LCD";
+QueueHandle_t bl_queue = NULL;
+
+void bl_handler(void *arg)
+{
+    bl_msg_t msg;
+
+    while(1) {
+        if(xQueueReceive(bl_queue, &msg, portMAX_DELAY)) {
+            ESP_LOGI(TAG, "Setting backlight duty to %d", msg.duty);
+            ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, msg.duty);
+            ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+        }
+    }
+
+}
 
 esp_lcd_panel_handle_t display_startup(void)
 {
@@ -32,6 +47,9 @@ esp_lcd_panel_handle_t display_startup(void)
         .sleep_mode = LEDC_SLEEP_MODE_NO_ALIVE_NO_PD,
     };
     ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
+
+    bl_queue = xQueueCreate(10, sizeof(bl_msg_t));
+    xTaskCreate(bl_handler, "bl_handler", 2048, NULL, 5, NULL);
 
     ESP_LOGI(TAG, "Initialize SPI bus");
     const spi_bus_config_t bus_config = GC9A01_PANEL_BUS_SPI_CONFIG(PIN_NUM_LCD_PCLK, PIN_NUM_LCD_MOSI,

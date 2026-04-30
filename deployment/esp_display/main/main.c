@@ -8,7 +8,7 @@
 
 void app_main(void)
 {
-    printf("LVGL display demo starting...\n");
+    printf("Booted, beginning program...\n");
 
     esp_lcd_panel_handle_t panel_handle = display_startup();
     lvgl_display_init(panel_handle);
