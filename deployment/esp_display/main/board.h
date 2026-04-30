@@ -1,7 +1,7 @@
 #define LCD_HOST               SPI2_HOST
 #define LCD_H_RES              (240)
 #define LCD_V_RES              (240)
-#define LCD_BIT_PER_PIXEL      (18)
+#define LCD_BIT_PER_PIXEL      (16)
 
 #define PIN_NUM_LCD_CS         (GPIO_NUM_9)
 #define PIN_NUM_LCD_PCLK       (GPIO_NUM_10)
