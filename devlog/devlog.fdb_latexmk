@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1776658671.16856 "c:/Users/Fourt/Desktop/Projects/esp32-display/devlog/devlog.tex" "devlog.pdf" "devlog" 1776658671.62114 0
+["pdflatex"] 1777581562.29993 "c:/Users/Fourt/Desktop/Projects/esp32-display/devlog/devlog.tex" "devlog.pdf" "devlog" 1777581562.74132 0
   "C:/Users/Fourt/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1776364201 83609 ebbc432e6cbbb238d39535255db2c8bd ""
   "C:/Users/Fourt/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/tcrm1000.pk" 1769214751 11548 dcf3ac49084d19c2c4260e2721bfa4a1 ""
   "C:/Users/Fourt/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1769463425 13333487 2a2f672188d5cedd5715f169ba6e469f ""
@@ -53,10 +53,10 @@
   "C:/Users/Fourt/AppData/Local/Programs/MiKTeX/tex/latex/refcount/refcount.sty" 1576433952 9878 9e94e8fa600d95f9c7731bb21dfb67a4 ""
   "C:/Users/Fourt/AppData/Local/Programs/MiKTeX/tex/latex/rerunfilecheck/rerunfilecheck.sty" 1751104012 9684 a33a14b82ce60d6e77cb9be689d79ee6 ""
   "C:/Users/Fourt/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
-  "c:/Users/Fourt/Desktop/Projects/esp32-display/devlog/devlog.tex" 1776658670 2439 eefa483ca31a9577d24d777a11ab11f1 ""
-  "devlog.aux" 1776658671 1343 b0b3ba01250566a4dbfd743bd834ecda "pdflatex"
-  "devlog.out" 1776658671 1080 5dc3d6ab519b380d3767605cfd05eff0 "pdflatex"
-  "devlog.tex" 1776658670 2439 eefa483ca31a9577d24d777a11ab11f1 ""
+  "c:/Users/Fourt/Desktop/Projects/esp32-display/devlog/devlog.tex" 1777581561 2975 14eb17dc8e19c5c2afd29b5276120d42 ""
+  "devlog.aux" 1777581562 1615 7c6132a89774525f98e2ee1737114b67 "pdflatex"
+  "devlog.out" 1777581562 1455 2575de4050b1495fc856fba43fbe7920 "pdflatex"
+  "devlog.tex" 1777581561 2975 14eb17dc8e19c5c2afd29b5276120d42 ""
   (generated)
   "devlog.aux"
   "devlog.log"

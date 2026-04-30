@@ -67,4 +67,17 @@ Save images to PSRAM (2mb limit). This means images are lost on power disconnect
 
 Monitor ADC for battery voltage and go into deep sleep when battery is low?
 
+\subsection{Peripheral Functions}
+
+\subsubsection{Backlight Brightness Control}
+
+Controlled with a queue and handler task. The handler waits until it sees a message in the queue, then sets the brightness to the requested duty cycle.
+Duty cycle resolution is 8 bits, so pass a value between 0 and 255. Include display.h to use the queue, then send messages like this:
+\begin{verbatim}
+bl_msg_t msg = {
+    .duty = 128
+};
+\end{verbatim}
+Then send the message to the queue with xQueueSend(bl\_queue, \&msg, portMAX\_DELAY);.
+
 \end{document}

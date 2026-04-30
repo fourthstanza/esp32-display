@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.26)  20 APR 2026 00:17
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.26)  30 APR 2026 16:39
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -195,20 +195,20 @@ LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-29>
  ***********
 Package rerunfilecheck Info: File `devlog.out' has not changed.
-(rerunfilecheck)             Checksum: 5DC3D6AB519B380D3767605CFD05EFF0;1080.
+(rerunfilecheck)             Checksum: 2575DE4050B1495FC856FBA43FBE7920;1455.
  ) 
 Here is how much of TeX's memory you used:
- 7622 strings out of 467871
- 119506 string characters out of 5418376
- 532863 words of memory out of 5000000
- 36450 multiletter control sequences out of 15000+600000
+ 7628 strings out of 467871
+ 119636 string characters out of 5418376
+ 532871 words of memory out of 5000000
+ 36454 multiletter control sequences out of 15000+600000
  632479 words of font info for 56 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,6n,79p,295b,511s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,6n,79p,318b,511s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\Fourt\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1000.pk><C:/Users/Fourt/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/Fourt/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/Fourt/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Fourt/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/Fourt/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/Fourt/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Fourt/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on devlog.pdf (2 pages, 111150 bytes).
+Output written on devlog.pdf (2 pages, 116637 bytes).
 PDF statistics:
- 104 PDF objects out of 1000 (max. 8388607)
- 13 named destinations out of 1000 (max. 500000)
- 81 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 112 PDF objects out of 1000 (max. 8388607)
+ 15 named destinations out of 1000 (max. 500000)
+ 97 words of extra memory for PDF output out of 10000 (max. 10000000)
 
