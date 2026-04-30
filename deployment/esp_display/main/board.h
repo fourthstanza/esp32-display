@@ -10,4 +10,4 @@
 #define PIN_NUM_LCD_DC         (GPIO_NUM_8)
 #define PIN_NUM_LCD_BL         (GPIO_NUM_2)
 
-#define RGB_ORDER              LCD_RGB_ELEMENT_ORDER_RGB
+#define RGB_ORDER              LCD_RGB_ELEMENT_ORDER_BGR

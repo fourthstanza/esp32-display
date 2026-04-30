@@ -42,14 +42,17 @@ esp_lcd_panel_handle_t display_startup(void)
         .speed_mode = LEDC_LOW_SPEED_MODE,
         .channel = LEDC_CHANNEL_0,
         .timer_sel = LEDC_TIMER_0,
-        .duty = 100,
+        .duty = 255,
         .hpoint = 0,
         .sleep_mode = LEDC_SLEEP_MODE_NO_ALIVE_NO_PD,
     };
     ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
 
     bl_queue = xQueueCreate(10, sizeof(bl_msg_t));
-    xTaskCreate(bl_handler, "bl_handler", 2048, NULL, 5, NULL);
+    BaseType_t ok = xTaskCreate(bl_handler, "bl_handler", 2048, NULL, 5, NULL);
+    if (ok != pdPASS) {
+        ESP_LOGE(TAG, "xTaskCreate(bl_handler) failed");
+    }
 
     ESP_LOGI(TAG, "Initialize SPI bus");
     const spi_bus_config_t bus_config = GC9A01_PANEL_BUS_SPI_CONFIG(PIN_NUM_LCD_PCLK, PIN_NUM_LCD_MOSI,

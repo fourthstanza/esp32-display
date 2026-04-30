@@ -9,6 +9,7 @@
 #include "lvgl.h"
 #include "board.h"
 #include "display.h"
+#include "gif/gif.h"
 
 static const char *TAG = "lvgl";
 
@@ -40,7 +41,7 @@ static void lvgl_flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px
     static uint16_t line_buf[LCD_H_RES];
     
     // fixes incorrect bit order on gc901a
-    lv_draw_sw_rgb565_swap(src, LCD_H_RES * LCD_V_RES);
+    lv_draw_sw_rgb565_swap(src, w * h);
 
     for (int row = 0; row < h; row++) {
         for (int col = 0; col < w; col++) {
@@ -61,6 +62,13 @@ static void lvgl_splashscreen(void)
     lv_obj_set_style_text_font(label, &lv_font_montserrat_30, 0);
     lv_label_set_text(label, "Booting...");
     lv_obj_center(label);
+}
+
+static void lvgl_gif_open(void)
+{
+    lv_obj_t * img = lv_gif_create(lv_screen_active());
+    lv_gif_set_src(img, &lusctalk_one_to_one);
+    lv_obj_center(img);
 }
 
 /**
@@ -93,8 +101,13 @@ static void lvgl_port_task(void *arg)
     ESP_ERROR_CHECK(esp_timer_start_periodic(s_lvgl_tick_timer, 1000));
 
     lvgl_splashscreen();
+    lv_timer_handler();
+
+    vTaskDelay(pdMS_TO_TICKS(2000));
 
     ESP_LOGI(TAG, "LVGL running (%dx%d)", LCD_H_RES, LCD_V_RES);
+
+    lvgl_gif_open();
 
     while (1) {
         uint32_t delay_ms = lv_timer_handler();
