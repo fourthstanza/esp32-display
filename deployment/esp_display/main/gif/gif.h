@@ -13,3 +13,4 @@
 #endif
 
 extern const lv_image_dsc_t lusctalk_one_to_one;
+extern const lv_image_dsc_t gif_bytes;
