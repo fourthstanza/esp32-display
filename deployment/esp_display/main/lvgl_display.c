@@ -47,10 +47,7 @@ static void lvgl_flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px
         for (int col = 0; col < w; col++) {
             line_buf[col] = src[row * w + col];
         }
-        esp_err_t err = esp_lcd_panel_draw_bitmap(panel, x1, y1 + row, x2 + 1, y1 + row + 1, line_buf);
-        if (err != ESP_OK) {
-            ESP_LOGE(TAG, "draw_bitmap failed: %s", esp_err_to_name(err));
-        }
+        ESP_ERROR_CHECK(esp_lcd_panel_draw_bitmap(panel, x1, y1 + row, x2 + 1, y1 + row + 1, line_buf));
     }
     
     lv_display_flush_ready(disp);
@@ -66,8 +63,10 @@ static void lvgl_splashscreen(void)
 
 static void lvgl_gif_open(void)
 {
-    lv_obj_t * img = lv_gif_create(lv_screen_active());
-    lv_gif_set_src(img, &lusctalk_one_to_one);
+    LV_IMAGE_DECLARE(gif_bytes);
+    lv_obj_t *img = lv_gif_create(lv_screen_active());
+    lv_gif_set_color_format(img, LV_COLOR_FORMAT_RGB565);
+    lv_gif_set_src(img, &gif_bytes);
     lv_obj_center(img);
 }
 
