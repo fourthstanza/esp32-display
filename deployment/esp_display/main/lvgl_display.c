@@ -10,17 +10,19 @@
 #include "board.h"
 #include "display.h"
 #include "gif/gif.h"
+#include "esp_sleep.h"
 
 static const char *TAG = "lvgl";
 
 /** full single frame buffer height. Reduce this if we are having memory issues */
 #define LVGL_BUF_LINES          240
 #define LVGL_BUF_PIXELS         (LCD_H_RES * LVGL_BUF_LINES)
-#define LVGL_BUF_SIZE           (LVGL_BUF_PIXELS * 2)
+#define LVGL_BUF_SIZE           (LVGL_BUF_PIXELS * 3)
 #define LVGL_REFRESH_PERIOD_MS  30
 
-static uint8_t s_lvgl_buf1[LVGL_BUF_SIZE] __attribute__((aligned(4)));
 static esp_timer_handle_t s_lvgl_tick_timer;
+static uint8_t *buf1 = NULL;
+static uint8_t *buf2 = NULL;
 
 static void lvgl_tick_cb(void *arg)
 {
@@ -53,6 +55,64 @@ static void lvgl_flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px
     lv_display_flush_ready(disp);
 }
 
+void bl_set(int y) {
+    
+    int dutyset = y * 255 / 200;
+    if (dutyset > 255) {
+        dutyset = 255;
+    }
+
+    bl_msg_t msg = {
+        .duty = dutyset,
+    };
+    xQueueSend(bl_queue, &msg, portMAX_DELAY);
+}
+
+void sleep_set(int x) {
+    if (x > 150) {
+        ESP_LOGI(TAG, "Entering deep sleep mode");
+        vTaskDelay(pdMS_TO_TICKS(1000)); // Give some time for the log to be printed
+        esp_deep_sleep_start();
+    }
+}
+
+static void touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
+{
+    
+    esp_lcd_touch_handle_t touch =
+        (esp_lcd_touch_handle_t)lv_indev_get_user_data(indev);
+
+    static lv_point_t last_point;
+
+    esp_lcd_touch_point_data_t points[1];  // LVGL uses single-point
+    uint8_t point_cnt = 0;
+
+    // Always read latest data first
+    esp_lcd_touch_read_data(touch);
+
+    esp_err_t err = esp_lcd_touch_get_data(
+        touch,
+        points,
+        &point_cnt,
+        1
+    );
+
+    if (err == ESP_OK && point_cnt > 0) {
+        last_point.x = points[0].x;
+        last_point.y = points[0].y;
+
+        data->state = LV_INDEV_STATE_PRESSED;
+        ESP_LOGI(TAG, "Touch at (%d, %d)", last_point.x, last_point.y);
+        bl_set(last_point.y);
+        sleep_set(last_point.x);
+    } else {
+        data->state = LV_INDEV_STATE_RELEASED;
+    }
+
+    // LVGL requires last known position always returned
+    data->point = last_point;
+}
+
 static void lvgl_splashscreen(void)
 {
     lv_obj_t *label = lv_label_create(lv_screen_active());
@@ -75,7 +135,11 @@ static void lvgl_gif_open(void)
  */
 static void lvgl_port_task(void *arg)
 {
-    esp_lcd_panel_handle_t panel = (esp_lcd_panel_handle_t)arg;
+    lvgl_contxt_t *ctx = (lvgl_contxt_t *)arg;
+
+    esp_lcd_panel_handle_t panel = ctx->panel;
+    esp_lcd_touch_handle_t touch = ctx->touch;
+    free(ctx);
 
     lv_init();
 
@@ -86,10 +150,20 @@ static void lvgl_port_task(void *arg)
         return;
     }
 
+    buf1 = malloc(LVGL_BUF_SIZE);
+    buf2 = malloc(LVGL_BUF_SIZE);
+    if (buf1 == NULL || buf2 == NULL) {
+        ESP_LOGE(TAG, "Failed to allocate buffer");
+        free(buf1);
+        free(buf2);
+        vTaskDelete(NULL);
+        return;
+    }
+    ESP_LOGE(TAG, "Free heap size: %d", esp_get_free_heap_size());
     lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565);
     lv_display_set_user_data(disp, panel);
     lv_display_set_flush_cb(disp, lvgl_flush_cb);
-    lv_display_set_buffers(disp, s_lvgl_buf1, NULL, sizeof(s_lvgl_buf1), LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_display_set_buffers(disp, buf1, buf2, LVGL_BUF_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
     lv_display_set_default(disp);
 
     const esp_timer_create_args_t tick_args = {
@@ -98,6 +172,11 @@ static void lvgl_port_task(void *arg)
     };
     ESP_ERROR_CHECK(esp_timer_create(&tick_args, &s_lvgl_tick_timer));
     ESP_ERROR_CHECK(esp_timer_start_periodic(s_lvgl_tick_timer, 1000));
+
+    lv_indev_t * indev_drv = lv_indev_create();
+    lv_indev_set_user_data(indev_drv, touch);
+    lv_indev_set_type(indev_drv, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(indev_drv, touch_read_cb);
 
     lvgl_splashscreen();
     lv_timer_handler();
@@ -110,8 +189,8 @@ static void lvgl_port_task(void *arg)
 
     while (1) {
         uint32_t delay_ms = lv_timer_handler();
-        if (delay_ms > 500) {
-            delay_ms = 500;
+        if (delay_ms > 300) {
+            delay_ms = 300;
         }
         if (delay_ms < 30) {
             delay_ms = 30;
@@ -120,9 +199,14 @@ static void lvgl_port_task(void *arg)
     }
 }
 
-void lvgl_display_init(esp_lcd_panel_handle_t panel)
+void lvgl_display_init(esp_lcd_panel_handle_t panel, esp_lcd_touch_handle_t touch)
 {
-    const BaseType_t ok = xTaskCreate(lvgl_port_task, "lvgl", 8192, panel, 5, NULL);
+
+    lvgl_contxt_t *ctx = malloc(sizeof(lvgl_contxt_t));
+    ctx->panel = panel;
+    ctx->touch = touch;
+
+    const BaseType_t ok = xTaskCreate(lvgl_port_task, "lvgl", 8192, ctx, 5, NULL);
     if (ok != pdPASS) {
         ESP_LOGE(TAG, "xTaskCreate(lvgl) failed");
     }
