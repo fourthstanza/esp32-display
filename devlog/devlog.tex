@@ -77,6 +77,7 @@ Duty cycle resolution is 8 bits, so pass a value between 0 and 255. Include disp
 bl_msg_t msg = {
     .duty = 128
 };
+
 \end{verbatim}
 Then send the message to the queue with xQueueSend(bl\_queue, \&msg, portMAX\_DELAY);.
 
