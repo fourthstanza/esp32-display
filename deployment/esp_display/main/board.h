@@ -10,4 +10,10 @@
 #define PIN_NUM_LCD_DC         (GPIO_NUM_8)
 #define PIN_NUM_LCD_BL         (GPIO_NUM_2)
 
+#define PIN_NUM_TOUCH_SCL       (GPIO_NUM_7)
+#define PIN_NUM_TOUCH_SDA       (GPIO_NUM_6)
+#define PIN_NUM_TOUCH_INT       (GPIO_NUM_5)
+#define PIN_NUM_TOUCH_RST       (GPIO_NUM_13)
+#define TOUCH_I2C_NUM           (0)
+
 #define RGB_ORDER              LCD_RGB_ELEMENT_ORDER_BGR
