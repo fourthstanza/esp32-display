@@ -73,6 +73,7 @@ esp_lcd_panel_handle_t display_startup(void)
         .rgb_ele_order = RGB_ORDER,                  
         .bits_per_pixel =  LCD_BIT_PER_PIXEL,                        
     };
+    
     ESP_ERROR_CHECK(esp_lcd_new_panel_gc9a01(io_handle, &panel_config, &panel_handle));
     ESP_ERROR_CHECK(esp_lcd_panel_reset(panel_handle));
     ESP_ERROR_CHECK(esp_lcd_panel_init(panel_handle));

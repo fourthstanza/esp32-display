@@ -11,6 +11,7 @@
 #include "display.h"
 #include "gif/gif.h"
 #include "esp_sleep.h"
+#include "touch_panel.h"
 
 static const char *TAG = "lvgl";
 
@@ -84,11 +85,16 @@ static void touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
 
     static lv_point_t last_point;
 
-    esp_lcd_touch_point_data_t points[1];  // LVGL uses single-point
+    esp_lcd_touch_point_data_t points[1];  
     uint8_t point_cnt = 0;
-
-    // Always read latest data first
-    esp_lcd_touch_read_data(touch);
+    if (touch_event_pending_get() || data->state == LV_INDEV_STATE_PRESSED) {
+        touch_event_pending_clear();
+        esp_lcd_touch_read_data(touch);
+    } else {
+        data->state = LV_INDEV_STATE_RELEASED;
+        data->point = last_point;
+        return;
+    }
 
     esp_err_t err = esp_lcd_touch_get_data(
         touch,
@@ -159,6 +165,7 @@ static void lvgl_port_task(void *arg)
         vTaskDelete(NULL);
         return;
     }
+    
     ESP_LOGE(TAG, "Free heap size: %d", esp_get_free_heap_size());
     lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565);
     lv_display_set_user_data(disp, panel);

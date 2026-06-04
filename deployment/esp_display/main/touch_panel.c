@@ -4,6 +4,18 @@
 #include "esp_lcd_touch_cst816s.h"
 #include "lvgl_display.h"
 
+static volatile bool touch_event_pending = false;
+
+bool touch_event_pending_get(void)
+{
+    return touch_event_pending;
+}
+
+void touch_event_pending_clear(void)
+{
+    touch_event_pending = false;
+}
+
 i2c_master_bus_handle_t i2c_init(void) 
 {
     i2c_master_bus_handle_t i2c_handle = NULL;
@@ -43,27 +55,31 @@ esp_lcd_touch_handle_t touch_panel_init(i2c_master_bus_handle_t i2c_handle)
     return touch_handle;
 }
 
+void touch_interrupt_handler(void *arg)
+{
+    touch_event_pending = true;
+}
+
 void int_touch_interrupt_handler(void){
+    
     gpio_config_t io_conf = {
         .pin_bit_mask = 1ULL << PIN_NUM_TOUCH_INT,
         .mode = GPIO_MODE_INPUT,
-        .pull_up_en = GPIO_PULLUP_ENABLE,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type = GPIO_INTR_NEGEDGE   
+        .intr_type = GPIO_INTR_ANYEDGE,   
     };
     gpio_config(&io_conf);
 
-    // Install ISR service (once globally)
     gpio_install_isr_service(0);
 
-    // Attach your handler
-    gpio_isr_handler_add(PIN_NUM_TOUCH_INT, NULL, NULL);
+    gpio_isr_handler_add(PIN_NUM_TOUCH_INT, touch_interrupt_handler, NULL);
 }
 
 esp_lcd_touch_handle_t touch_panel_startup(void) 
 {
     i2c_master_bus_handle_t i2c_handle = i2c_init();
-    return touch_panel_init(i2c_handle);
     int_touch_interrupt_handler();
+    return touch_panel_init(i2c_handle);
 }
 
